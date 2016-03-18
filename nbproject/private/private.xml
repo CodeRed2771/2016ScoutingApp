@@ -3,12 +3,13 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/SirBlooby/Documents/NetBeansProjects/Scouting/src/scouting/Competition.java</file>
-            <file>file:/C:/Users/SirBlooby/Documents/NetBeansProjects/Scouting/src/scouting/Serialization.java</file>
-            <file>file:/C:/Users/SirBlooby/Documents/NetBeansProjects/Scouting/src/scouting/ScoutingMethods.java</file>
-            <file>file:/C:/Users/SirBlooby/Documents/NetBeansProjects/Scouting/src/scouting/Scouting.java</file>
-            <file>file:/C:/Users/SirBlooby/Documents/NetBeansProjects/Scouting/src/scouting/readMe.java</file>
-            <file>file:/C:/Users/SirBlooby/Documents/NetBeansProjects/Scouting/src/scouting/Team.java</file>
+            <file>file:/C:/Users/SirBlooby/Documents/NetBeansProjects/Scouting/src/com/coderedrobotics/scouting/Competition.java</file>
+            <file>file:/C:/Users/SirBlooby/Documents/NetBeansProjects/Scouting/src/com/coderedrobotics/scouting/Serialization.java</file>
+            <file>file:/C:/Users/SirBlooby/Documents/NetBeansProjects/Scouting/src/com/coderedrobotics/scouting/ScoutingMethods.java</file>
+            <file>file:/C:/Users/SirBlooby/Documents/NetBeansProjects/Scouting/src/com/coderedrobotics/scouting/GUI.java</file>
+            <file>file:/C:/Users/SirBlooby/Documents/NetBeansProjects/Scouting/src/com/coderedrobotics/scouting/LookupGUI.java</file>
+            <file>file:/C:/Users/SirBlooby/Documents/NetBeansProjects/Scouting/src/com/coderedrobotics/scouting/Team.java</file>
+            <file>file:/C:/Users/SirBlooby/Documents/NetBeansProjects/Scouting/src/com/coderedrobotics/scouting/README</file>
         </group>
     </open-files>
 </project-private>
