@@ -54,7 +54,14 @@ public class GUI extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
         scoringPanel = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        disposition = new javax.swing.JSlider();
+        broken = new javax.swing.JCheckBox();
+        doesntFollowRules = new javax.swing.JCheckBox();
+        jLabel9 = new javax.swing.JLabel();
+        fudge = new javax.swing.JSpinner();
+        manualOverride = new javax.swing.JSpinner();
+        jLabel10 = new javax.swing.JLabel();
         autonomousPanel = new javax.swing.JPanel();
         autonCanReach = new javax.swing.JCheckBox();
         autonLowGoal = new javax.swing.JCheckBox();
@@ -133,7 +140,7 @@ public class GUI extends javax.swing.JFrame {
         defensePanelLayout.setVerticalGroup(
             defensePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(defensePanelLayout.createSequentialGroup()
-                .addContainerGap(10, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(portcullis)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(chivalDeFrise)
@@ -204,11 +211,11 @@ public class GUI extends javax.swing.JFrame {
             towerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(towerPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(towerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lowGoal)
+                .addGroup(towerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(towerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(climbSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel3)))
+                        .addComponent(jLabel3))
+                    .addComponent(lowGoal))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(challenge)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -222,10 +229,25 @@ public class GUI extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        scoringPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Scoring"));
+        scoringPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Control"));
 
-        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel4.setText("---- Reserved ----");
+        jLabel8.setText("Disposition");
+
+        disposition.setMajorTickSpacing(1);
+        disposition.setMaximum(3);
+        disposition.setMinimum(1);
+        disposition.setPaintLabels(true);
+        disposition.setPaintTicks(true);
+        disposition.setSnapToTicks(true);
+        disposition.setValue(2);
+
+        broken.setText("Broken");
+
+        doesntFollowRules.setText("Doesn't follow game rules");
+
+        jLabel9.setText("Manual Ranking Fudge:");
+
+        jLabel10.setText("Man. Rank Override:");
 
         javax.swing.GroupLayout scoringPanelLayout = new javax.swing.GroupLayout(scoringPanel);
         scoringPanel.setLayout(scoringPanelLayout);
@@ -233,15 +255,44 @@ public class GUI extends javax.swing.JFrame {
             scoringPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(scoringPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE)
+                .addGroup(scoringPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(disposition, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(scoringPanelLayout.createSequentialGroup()
+                        .addComponent(jLabel9)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(fudge, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(scoringPanelLayout.createSequentialGroup()
+                        .addGroup(scoringPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(doesntFollowRules)
+                            .addComponent(jLabel8)
+                            .addComponent(broken))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(scoringPanelLayout.createSequentialGroup()
+                        .addComponent(jLabel10)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(manualOverride, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         scoringPanelLayout.setVerticalGroup(
             scoringPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(scoringPanelLayout.createSequentialGroup()
-                .addGap(109, 109, 109)
-                .addComponent(jLabel4)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap()
+                .addComponent(jLabel8)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(disposition, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(broken)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(doesntFollowRules)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(scoringPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel10)
+                    .addComponent(manualOverride, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(scoringPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel9)
+                    .addComponent(fudge, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
 
         autonomousPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Autonomous"));
@@ -337,7 +388,7 @@ public class GUI extends javax.swing.JFrame {
                 .addGroup(autonomousPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(autonomousPanelLayout.createSequentialGroup()
                         .addComponent(autonCanReach)
-                        .addContainerGap(241, Short.MAX_VALUE))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(autonomousPanelLayout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(autonLowGoal)
@@ -457,6 +508,11 @@ public class GUI extends javax.swing.JFrame {
                 t.setAutoRoughTerrain(autonRoughTerrain.isSelected());
                 t.setAutoLowbar(autonLowBar.isSelected());
                 t.setNotes(notes.getText());
+                t.setBroken(broken.isSelected());
+                t.setDisposition(disposition.getValue());
+                t.setDoesntFollowRules(doesntFollowRules.isSelected());
+                t.setRankingFudge(Integer.parseInt(fudge.getValue().toString()));
+                t.setManualRankOverride(Integer.parseInt(manualOverride.getValue().toString()));
             }
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Please enter an integer climb speed.", "Number Format Exception", JOptionPane.ERROR_MESSAGE);
@@ -530,6 +586,11 @@ public class GUI extends javax.swing.JFrame {
         autonRoughTerrain.setSelected(t.canAutoRoughTerrain());
         autonLowBar.setSelected(t.canAutoLowbar());
         notes.setText(t.getNotes());
+        broken.setSelected(t.isBroken());
+        doesntFollowRules.setSelected(t.doesntFollowRules());
+        fudge.setValue(t.getRankingFudge());
+        manualOverride.setValue(t.getManualRankOverride());
+        disposition.setValue(t.getDisposition());
     }//GEN-LAST:event_teamNumberActionPerformed
 
     private void lookupButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lookupButtonActionPerformed
@@ -580,26 +641,33 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JCheckBox autonRoughTerrain;
     private javax.swing.JCheckBox autonSallyPort;
     private javax.swing.JPanel autonomousPanel;
+    private javax.swing.JCheckBox broken;
     private javax.swing.JCheckBox challenge;
     private javax.swing.JCheckBox chivalDeFrise;
     private javax.swing.JTextField climbSpeed;
     private javax.swing.JSlider climbing;
     private javax.swing.JPanel defensePanel;
+    private javax.swing.JSlider disposition;
+    private javax.swing.JCheckBox doesntFollowRules;
     private javax.swing.JCheckBox drawbridge;
+    private javax.swing.JSpinner fudge;
     private javax.swing.JSlider highGoal;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JButton lookupButton;
     private javax.swing.JCheckBox lowBar;
     private javax.swing.JCheckBox lowGoal;
+    private javax.swing.JSpinner manualOverride;
     private javax.swing.JCheckBox moat;
     private javax.swing.JTextArea notes;
     private javax.swing.JCheckBox portcullis;

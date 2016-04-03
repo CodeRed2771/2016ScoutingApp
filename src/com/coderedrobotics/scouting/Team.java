@@ -6,6 +6,13 @@ public class Team implements Serializable {
 
     private final int number;
 
+    // CONTROL
+    private int disposition = 2; // scale from 1-3;
+    private boolean broken;
+    private boolean doesntFollowRules;
+    private int rankingFudge;
+    private int manualRankOverride;
+
     // DEFENSES
     private boolean chivalDeFrise;
     private boolean portcullis;
@@ -16,7 +23,7 @@ public class Team implements Serializable {
     private boolean moat;
     private boolean ramparts;
     private boolean lowBar;
-    
+
     // TOWER
     private int climbingScore;
     private int climbingSpeed;
@@ -269,6 +276,46 @@ public class Team implements Serializable {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public int getDisposition() {
+        return disposition;
+    }
+
+    public void setDisposition(int disposition) {
+        this.disposition = disposition;
+    }
+
+    public boolean isBroken() {
+        return broken;
+    }
+
+    public void setBroken(boolean broken) {
+        this.broken = broken;
+    }
+
+    public boolean doesntFollowRules() {
+        return doesntFollowRules;
+    }
+
+    public void setDoesntFollowRules(boolean doesntFollowRules) {
+        this.doesntFollowRules = doesntFollowRules;
+    }
+
+    public int getRankingFudge() {
+        return rankingFudge;
+    }
+
+    public void setRankingFudge(int rankingFudge) {
+        this.rankingFudge = rankingFudge;
+    }
+
+    public int getManualRankOverride() {
+        return manualRankOverride;
+    }
+
+    public void setManualRankOverride(int manualRankOverride) {
+        this.manualRankOverride = manualRankOverride;
     }
 
     //autonomous should give only 3 different values

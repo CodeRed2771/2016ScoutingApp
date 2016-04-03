@@ -1,5 +1,11 @@
 package com.coderedrobotics.scouting;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import javax.swing.JOptionPane;
 
 /**
@@ -28,11 +34,12 @@ public class LookupGUI extends javax.swing.JFrame {
         jTextField1 = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         jLabel2 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Team Number Lookup");
 
-        jLabel1.setText("Lookup Team Number:");
+        jLabel1.setText("Query:");
 
         jTextField1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -44,6 +51,13 @@ public class LookupGUI extends javax.swing.JFrame {
         jLabel2.setVerticalAlignment(javax.swing.SwingConstants.TOP);
         jScrollPane1.setViewportView(jLabel2);
 
+        jButton1.setText("?");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -53,7 +67,9 @@ public class LookupGUI extends javax.swing.JFrame {
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(483, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButton1)
+                .addContainerGap(551, Short.MAX_VALUE))
             .addComponent(jScrollPane1)
         );
         layout.setVerticalGroup(
@@ -62,7 +78,8 @@ public class LookupGUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 601, Short.MAX_VALUE))
         );
@@ -71,30 +88,232 @@ public class LookupGUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
-        int number;
-        try {
-            number = Integer.parseInt(jTextField1.getText());
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Please enter a valid team number", "Number Format Exception", JOptionPane.ERROR_MESSAGE);
-            return;
+        String report;
+
+        if (jTextField1.getText().contains(",")) {
+            try {
+                String[] snums = jTextField1.getText().trim().replaceAll(" ", "").split(",");
+                int[] nums = new int[snums.length];
+                for (int i = 0; i < nums.length; i++) {
+                    nums[i] = Integer.parseInt(snums[i]);
+                }
+
+                if (!Competition.getInstance().teamExists(nums[0]) || !Competition.getInstance().teamExists(nums[1])
+                        || !Competition.getInstance().teamExists(nums[2])) {
+                    JOptionPane.showMessageDialog(this, "One of those teams does not exist.", "Lookup Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                report = generateReport(nums[0], nums[1], nums[2]);
+            } catch (NumberFormatException | NullPointerException | ArrayIndexOutOfBoundsException ex) {
+                JOptionPane.showMessageDialog(this, "Enter three numbers, seperated by commas", "Error Parsing Command", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        } else if ("highgoal".equals(jTextField1.getText())) {
+            TreeMap<Integer, Integer> map = new TreeMap<>();
+            for (Team t : Competition.getInstance().getTeams()) {
+                map.put(t.getNumber(), t.getHighGoalScore());
+            }
+            SortedSet<Map.Entry<Integer, Integer>> sortedEntries = new TreeSet<>(
+                    (Map.Entry<Integer, Integer> e1, Map.Entry<Integer, Integer> e2) -> {
+                        int res = e1.getValue().compareTo(e2.getValue());
+                        return -(res != 0 ? res : 1);
+                    });
+            sortedEntries.addAll(map.entrySet());
+            report = "<html><u>High Goal Rankings</u>:";
+            report = sortedEntries.stream().map((entry) -> "<br>" + entry.getKey() + " (" + entry.getValue() + ")").reduce(report, String::concat);
+            report += "</html>";
+        } else if ("climbing".equals(jTextField1.getText())) {
+            TreeMap<Integer, Integer> map = new TreeMap<>();
+            for (Team t : Competition.getInstance().getTeams()) {
+                map.put(t.getNumber(), t.getClimbingScore());
+            }
+            SortedSet<Map.Entry<Integer, Integer>> sortedEntries = new TreeSet<>(
+                    (Map.Entry<Integer, Integer> e1, Map.Entry<Integer, Integer> e2) -> {
+                        int res = e1.getValue().compareTo(e2.getValue());
+                        return -(res != 0 ? res : 1);
+                    });
+            sortedEntries.addAll(map.entrySet());
+            report = "<html><u>Climbing Rankings</u>:";
+            report = sortedEntries.stream().map((entry) -> "<br>" + entry.getKey() + " (" + entry.getValue()
+                    + " Speed: " + Competition.getInstance().getTeam(entry.getKey()).getClimbingSpeed() + ")").reduce(report, String::concat);
+            report += "</html>";
+        } else if ("challenge".equals(jTextField1.getText())) {
+            ArrayList<String> can = new ArrayList<>();
+            ArrayList<String> cannot = new ArrayList<>();
+
+            for (Team t : Competition.getInstance().getTeams()) {
+                if (t.canChallenge()) {
+                    can.add(String.valueOf(t.getNumber()));
+                } else {
+                    cannot.add(String.valueOf(t.getNumber()));
+                }
+            }
+
+            report = "<html>";
+            report += "<u>Can Challenge</u>:";
+            report = can.stream().map((team) -> "<br>" + team).reduce(report, String::concat);
+            report += "<br><br><u>Cannot Challenge</u>:";
+            report = cannot.stream().map((team) -> "<br>" + team).reduce(report, String::concat);
+        } else if ("lowgoal".equals(jTextField1.getText())) {
+            ArrayList<String> can = new ArrayList<>();
+            ArrayList<String> cannot = new ArrayList<>();
+
+            for (Team t : Competition.getInstance().getTeams()) {
+                if (t.canLowGoal()) {
+                    can.add(String.valueOf(t.getNumber()));
+                } else {
+                    cannot.add(String.valueOf(t.getNumber()));
+                }
+            }
+
+            report = "<html>";
+            report += "<u>Can Low Goal</u>:";
+            report = can.stream().map((team) -> "<br>" + team).reduce(report, String::concat);
+            report += "<br><br><u>Cannot Low Goal</u>:";
+            report = cannot.stream().map((team) -> "<br>" + team).reduce(report, String::concat);
+        } else if ("broke".equals(jTextField1.getText())) {
+            ArrayList<String> can = new ArrayList<>();
+            ArrayList<String> cannot = new ArrayList<>();
+
+            for (Team t : Competition.getInstance().getTeams()) {
+                if (t.isBroken()) {
+                    can.add(String.valueOf(t.getNumber()));
+                } else {
+                    cannot.add(String.valueOf(t.getNumber()));
+                }
+            }
+
+            report = "<html>";
+            report += "<u>Broken</u>:";
+            report = can.stream().map((team) -> "<br>" + team).reduce(report, String::concat);
+            report += "<br><br><u>Not Broken:</u>:";
+            report = cannot.stream().map((team) -> "<br>" + team).reduce(report, String::concat);
+        } else if ("rules".equals(jTextField1.getText())) {
+            ArrayList<String> can = new ArrayList<>();
+            ArrayList<String> cannot = new ArrayList<>();
+
+            for (Team t : Competition.getInstance().getTeams()) {
+                if (t.doesntFollowRules()) {
+                    can.add(String.valueOf(t.getNumber()));
+                } else {
+                    cannot.add(String.valueOf(t.getNumber()));
+                }
+            }
+
+            report = "<html>";
+            report += "<u>Doesn't Follow Rules</u>:";
+            report = can.stream().map((team) -> "<br>" + team).reduce(report, String::concat);
+            report += "<br><br><u>Does Follow Rules:</u>:";
+            report = cannot.stream().map((team) -> "<br>" + team).reduce(report, String::concat);
+        } else if ("defenses".equals(jTextField1.getText())) {
+            report = "<html><head><style>table { table-layout: fixed;}td{width: 40px;text-align:center;}</style></head>";
+            report += "<u>Defenses</u>";
+            report += "<table><tr>"
+                    + "<th>Team</th>"
+                    + "<th>Portcullis</th>"
+                    + "<th>Chival</th>"
+                    + "<th>Moat</th>"
+                    + "<th>Ramparts</th>"
+                    + "<th>Draw Bridge</th>"
+                    + "<th>Sally Port</th>"
+                    + "<th>Rock Wall</th>"
+                    + "<th>Rough Terrain</th>"
+                    + "<th>Low Bar</th></tr>";
+            for (Team t : Competition.getInstance().getTeams()) {
+                report += "<tr>";
+                report += "<td>" + t.getNumber() + "</td>";
+                report += "<td bgcolor=\"" + (t.canPortcullis() ? "#00FF00" : "#FF0000") + "\">" + (t.canPortcullis() ? "yes" : "no") + "</td>";
+                report += "<td bgcolor=\"" + (t.canChivalDeFrise() ? "#00FF00" : "#FF0000") + "\">" + (t.canChivalDeFrise() ? "yes" : "no") + "</td>";
+                report += "<td bgcolor=\"" + (t.canMoat() ? "#00FF00" : "#FF0000") + "\">" + (t.canMoat() ? "yes" : "no") + "</td>";
+                report += "<td bgcolor=\"" + (t.canRamparts() ? "#00FF00" : "#FF0000") + "\">" + (t.canRamparts() ? "yes" : "no") + "</td>";
+                report += "<td bgcolor=\"" + (t.canDrawBridge() ? "#00FF00" : "#FF0000") + "\">" + (t.canDrawBridge() ? "yes" : "no") + "</td>";
+                report += "<td bgcolor=\"" + (t.canSallyPort() ? "#00FF00" : "#FF0000") + "\">" + (t.canSallyPort() ? "yes" : "no") + "</td>";
+                report += "<td bgcolor=\"" + (t.canRockWall() ? "#00FF00" : "#FF0000") + "\">" + (t.canRockWall() ? "yes" : "no") + "</td>";
+                report += "<td bgcolor=\"" + (t.canRoughTerrain() ? "#00FF00" : "#FF0000") + "\">" + (t.canRoughTerrain() ? "yes" : "no") + "</td>";
+                report += "<td bgcolor=\"" + (t.canLowBar() ? "#00FF00" : "#FF0000") + "\">" + (t.canLowBar() ? "yes" : "no") + "</td>";
+                report += "</tr>";
+            }
+            report += "</table></html>";
+        } else if ("ranking".equals(jTextField1.getText())) {
+            TreeMap<Integer, Integer> map = new TreeMap<>();
+            TreeMap<Integer, Integer> manualOverride = new TreeMap<>();
+            for (Team t : Competition.getInstance().getTeams()) {
+                if (t.getManualRankOverride() > 0) {
+                    manualOverride.put(t.getNumber(), t.getManualRankOverride());
+                    continue; // skip this team as we don't want to sort it
+                }
+                double score = 0;
+                score += t.canPortcullis() ? 1.5 : 0;
+                score += t.canChivalDeFrise() ? 1 : 0;
+                score += t.canMoat() ? 1 : 0;
+                score += t.canRamparts() ? 1 : 0;
+                score += t.canDrawBridge() ? 2 : 0;
+                score += t.canSallyPort() ? 2 : 0;
+                score += t.canRockWall() ? 1 : 0;
+                score += t.canRoughTerrain() ? 1 : 0;
+                score += t.getClimbingScore() / 5;
+                score += t.canLowGoal() ? 2 : 0;
+                score += t.getRankingFudge() / 3;
+                score -= t.isBroken() ? 5 : 0;
+                score -= t.doesntFollowRules() ? 2 : 0;
+                score += (t.getDisposition() - 2) * 2;
+                map.put(t.getNumber(), (int) score);
+            }
+            SortedSet<Map.Entry<Integer, Integer>> sortedEntries = new TreeSet<>(
+                    (Map.Entry<Integer, Integer> e1, Map.Entry<Integer, Integer> e2) -> {
+                        int res = e1.getValue().compareTo(e2.getValue());
+                        return -(res != 0 ? res : 1);
+                    });
+            sortedEntries.addAll(map.entrySet());
+            SortedSet<Map.Entry<Integer, Integer>> sortedManualTeams = new TreeSet<>(
+                    (Map.Entry<Integer, Integer> e1, Map.Entry<Integer, Integer> e2) -> {
+                        int res = e1.getValue().compareTo(e2.getValue());
+                        return -(res != 0 ? res : 1);
+                    });
+            sortedManualTeams.addAll(manualOverride.entrySet());
+            report = "<html><u>Calculated Compliment Rankings</u>:";
+            report = sortedManualTeams.stream().map((entry) -> "<br>! <b>" + entry.getKey() + "</b> (" + entry.getValue() + ")").reduce(report, String::concat);
+            report = sortedEntries.stream().map((entry) -> "<br>" + entry.getKey() + " (" + entry.getValue() + ")").reduce(report, String::concat);
+            report += "</html>";
+        } else {
+            int number;
+            try {
+                number = Integer.parseInt(jTextField1.getText());
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Please enter a valid team number", "Number Format Exception", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (!Competition.getInstance().teamExists(number)) {
+                JOptionPane.showMessageDialog(this, "That team does not exist.", "Lookup Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            report = generateReport(number);
         }
-        
-        if (!Competition.getInstance().teamExists(number)) {
-            JOptionPane.showMessageDialog(this, "That team does not exist.", "Lookup Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        Team t = Competition.getInstance().getTeam(number);
+        jLabel2.setText(report);
+    }//GEN-LAST:event_jTextField1ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        JOptionPane.showMessageDialog(this, "Enter a query, then hit enter.\nOptions:\n\n1. [team]\n"
+                + "2. [team], [team], [team]\n3. challenge\n4. highgoal\n"
+                + "5. lowgoal\n6. climbing\n7. broke\n8. rules\n9. defenses", "Query Examples", JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    public String generateReport(int team) {
+        Team t = Competition.getInstance().getTeam(team);
         String report = "<html><b>REPORT FOR TEAM " + t.getNumber() + ":</b>";
+        report += "<br><br><b>This team " + (t.isBroken() ? "IS" : "IS NOT") + " broken.</b>";
+        report += (t.doesntFollowRules() ? "<br><b>This team has been known to not follow rules.</b>" : "");
         report += "<br><br><u>Defenses</u>:";
         report += "<br>Portcullis: <b>" + (t.canPortcullis() ? "yes" : "no") + "</b>";
-        report += "<br>Chival De Frise: <b>" + (t.canChivalDeFrise() ? "yes" : "no") + "</b>";
-        report += "<br>Moat: <b>" + (t.canMoat() ? "yes" : "no") + "</b>";
-        report += "<br>Ramparts: <b>" + (t.canRamparts() ? "yes" : "no") + "</b>";
-        report += "<br>Drawbridge: <b>" + (t.canDrawBridge() ? "yes" : "no") + "</b>";
-        report += "<br>Sally Port: <b>" + (t.canSallyPort() ? "yes" : "no") + "</b>";
-        report += "<br>Rock Wall: <b>" + (t.canRockWall() ? "yes" : "no") + "</b>";
-        report += "<br>Rough Terrain: <b>" + (t.canRoughTerrain() ? "yes" : "no") + "</b>";
-        report += "<br>Low Bar: <b>" + (t.canLowBar() ? "yes" : "no") + "</b>";
+        report += "<br>Chival De Frise: <b>\t" + (t.canChivalDeFrise() ? "yes" : "no") + "</b>";
+        report += "<br>Moat: \t<b>" + (t.canMoat() ? "yes" : "no") + "</b>";
+        report += "<br>Ramparts: \t<b>" + (t.canRamparts() ? "yes" : "no") + "</b>";
+        report += "<br>Drawbridge: \t<b>" + (t.canDrawBridge() ? "yes" : "no") + "</b>";
+        report += "<br>Sally Port: \t<b>" + (t.canSallyPort() ? "yes" : "no") + "</b>";
+        report += "<br>Rock Wall: \t<b>" + (t.canRockWall() ? "yes" : "no") + "</b>";
+        report += "<br>Rough Terrain: \t<b>" + (t.canRoughTerrain() ? "yes" : "no") + "</b>";
+        report += "<br>Low Bar: \t<b>" + (t.canLowBar() ? "yes" : "no") + "</b>";
         report += "<br><br><u>Tower</u>:";
         report += "<br>Team " + t.getNumber() + " <b>" + (t.canLowGoal() ? "CAN" : "CANNOT") + "</b> complete a low goal.";
         report += "<br>Team " + t.getNumber() + " <b>" + (t.canChallenge() ? "CAN" : "CANNOT") + "</b> challenge the tower.";
@@ -114,12 +333,152 @@ public class LookupGUI extends javax.swing.JFrame {
         report += "<br>Rough Terrain: <b>" + (t.canAutoRoughTerrain() ? "yes" : "no") + "</b>";
         report += "<br>Low Bar: <b>" + (t.canAutoLowbar() ? "yes" : "no") + "</b>";
         report += "<br><br><u>Additional notes for team " + t.getNumber() + "</u>:";
-        report += "<br>" + t.getNotes();
+        report += "<br>" + (!"".equals(t.getNotes()) ? t.getNotes() : "<i>none</i>");
         report += "</html>";
-        jLabel2.setText(report);
-    }//GEN-LAST:event_jTextField1ActionPerformed
+        return report;
+    }
+
+    public String generateReport(int team1, int team2, int team3) {
+        Team t1 = Competition.getInstance().getTeam(team1);
+        Team t2 = Competition.getInstance().getTeam(team2);
+        Team t3 = Competition.getInstance().getTeam(team3);
+        Team[] teams = {t1, t2, t3};
+
+        int t1DefenseTotal = 0, t2DefenseTotal = 0, t3DefenseTotal = 0;
+        for (boolean b : t1.canPass()) {
+            t1DefenseTotal += b ? 1 : 0;
+        }
+        for (boolean b : t2.canPass()) {
+            t2DefenseTotal += b ? 1 : 0;
+        }
+        for (boolean b : t3.canPass()) {
+            t3DefenseTotal += b ? 1 : 0;
+        }
+        int bestDefenseIndex = t1DefenseTotal > Math.max(t2DefenseTotal, t3DefenseTotal) ? 0
+                : t2DefenseTotal > Math.max(t1DefenseTotal, t3DefenseTotal) ? 1 : 2;
+
+        int bestHighGoalScore = t1.getHighGoalScore() > Math.max(t2.getHighGoalScore(), t3.getHighGoalScore()) ? 0
+                : t2.getHighGoalScore() > Math.max(t1.getHighGoalScore(), t3.getHighGoalScore()) ? 1 : 2;
+
+        int t1score = t1DefenseTotal + (t1.getClimbingScore() * (20 - t1.getClimbingSpeed()) / 30)
+                + t1.getHighGoalScore() + (t1.canLowGoal() ? 3 : 0) + (t1.canChallenge() ? 5 : 0)
+                + (t1.canAutoReach() ? 1 : 0) + (t1.canAutoHighGoal() ? 3 : 0);
+        int t2score = t2DefenseTotal + (t2.getClimbingScore() * (20 - t2.getClimbingSpeed()) / 30)
+                + t2.getHighGoalScore() + (t2.canLowGoal() ? 3 : 0) + (t2.canChallenge() ? 5 : 0)
+                + (t2.canAutoReach() ? 1 : 0) + (t2.canAutoHighGoal() ? 3 : 0);
+        int t3score = t3DefenseTotal + (t3.getClimbingScore() * (20 - t3.getClimbingSpeed()) / 30)
+                + t3.getHighGoalScore() + (t3.canLowGoal() ? 3 : 0) + (t3.canChallenge() ? 5 : 0)
+                + (t3.canAutoReach() ? 1 : 0) + (t3.canAutoHighGoal() ? 3 : 0);
+
+        String report = "<html><b>REPORT FOR TEAMS " + t1.getNumber() + ", "
+                + t2.getNumber() + ", " + t3.getNumber() + ":</b>";
+        report += "<br><br><u>Scouting Scores (Completely Unreliable, just for fun)</u>:";
+        report += "<br>Team " + t1.getNumber() + ": <b>" + t1score + "</b>";
+        report += "<br>Team " + t2.getNumber() + ": <b>" + t2score + "</b>";
+        report += "<br>Team " + t3.getNumber() + ": <b>" + t3score + "</b>";
+        report += "<br><br><b>Team " + t1.getNumber() + (t1.isBroken() ? "IS" : "IS NOT") + " broken.</b>";
+        report += (t1.doesntFollowRules() ? "<br><b>Team " + t1.getNumber() + " has been known to not follow rules.</b>" : "");
+        report += "<br><br><b>Team " + t2.getNumber() + (t2.isBroken() ? "IS" : "IS NOT") + " broken.</b>";
+        report += (t2.doesntFollowRules() ? "<br><b>Team " + t2.getNumber() + " has been known to not follow rules.</b>" : "");
+        report += "<br><br><b>Team " + t3.getNumber() + (t3.isBroken() ? "IS" : "IS NOT") + " broken.</b>";
+        report += (t3.doesntFollowRules() ? "<br><b>Team " + t3.getNumber() + " has been known to not follow rules.</b>" : "");
+        report += "<br><br><u>Defenses</u>:";
+        report += "<br><b>Team " + teams[bestDefenseIndex].getNumber() + " crosses the most defenses.</b>";
+        report += "<br>Portcullis: <b>" + (t1.canPortcullis() ? "yes" : "no")
+                + "</b>, <b>" + (t2.canPortcullis() ? "yes" : "no") + "</b>, <b>"
+                + (t3.canPortcullis() ? "yes" : "no") + "</b>";
+        report += "<br>Chival De Frise: <b>" + (t1.canChivalDeFrise() ? "yes" : "no")
+                + "</b>, <b>" + (t2.canChivalDeFrise() ? "yes" : "no") + "</b>, <b>"
+                + (t3.canChivalDeFrise() ? "yes" : "no") + "</b>";
+        report += "<br>Moat: <b>" + (t1.canMoat() ? "yes" : "no")
+                + "</b>, <b>" + (t2.canMoat() ? "yes" : "no") + "</b>, <b>"
+                + (t3.canMoat() ? "yes" : "no") + "</b>";
+        report += "<br>Ramparts: <b>" + (t1.canRamparts() ? "yes" : "no")
+                + "</b>, <b>" + (t2.canRamparts() ? "yes" : "no") + "</b>, <b>"
+                + (t3.canRamparts() ? "yes" : "no") + "</b>";
+        report += "<br>Drawbridge: <b>" + (t1.canDrawBridge() ? "yes" : "no")
+                + "</b>, <b>" + (t2.canDrawBridge() ? "yes" : "no") + "</b>, <b>"
+                + (t3.canDrawBridge() ? "yes" : "no") + "</b>";
+        report += "<br>Sally Port: <b>" + (t1.canSallyPort() ? "yes" : "no")
+                + "</b>, <b>" + (t2.canSallyPort() ? "yes" : "no") + "</b>, <b>"
+                + (t3.canSallyPort() ? "yes" : "no") + "</b>";
+        report += "<br>Rock Wall: <b>" + (t1.canRockWall() ? "yes" : "no")
+                + "</b>, <b>" + (t2.canRockWall() ? "yes" : "no") + "</b>, <b>"
+                + (t3.canRockWall() ? "yes" : "no") + "</b>";
+        report += "<br>Rough Terrain: <b>" + (t1.canRoughTerrain() ? "yes" : "no")
+                + "</b>, <b>" + (t2.canRoughTerrain() ? "yes" : "no") + "</b>, <b>"
+                + (t3.canRoughTerrain() ? "yes" : "no") + "</b>";
+        report += "<br>Low Bar: <b>" + (t1.canLowBar() ? "yes" : "no")
+                + "</b>, <b>" + (t2.canLowBar() ? "yes" : "no") + "</b>, <b>"
+                + (t3.canLowBar() ? "yes" : "no") + "</b>";
+        report += "<br><br><u>Tower</u>:";
+        report += "<br><b>Team " + teams[bestHighGoalScore].getNumber() + " is the best high goal shooter.</b>";
+        report += "<br>Team " + t1.getNumber() + " <b>" + (t1.canLowGoal() ? "CAN" : "CANNOT") + "</b> complete a low goal.";
+        report += "<br>Team " + t1.getNumber() + " <b>" + (t1.canChallenge() ? "CAN" : "CANNOT") + "</b> challenge the tower.";
+        report += "<br>Team " + t1.getNumber() + " has a climbing score of <b>" + t1.getClimbingScore() + "</b> and a speed of <b>" + t1.getClimbingSpeed() + "</b>";
+        report += "<br>Team " + t1.getNumber() + " has a high goal score of <b>" + t1.getHighGoalScore() + "</b>";
+        report += "<br>";
+        report += "<br>Team " + t2.getNumber() + " <b>" + (t2.canLowGoal() ? "CAN" : "CANNOT") + "</b> complete a low goal.";
+        report += "<br>Team " + t2.getNumber() + " <b>" + (t2.canChallenge() ? "CAN" : "CANNOT") + "</b> challenge the tower.";
+        report += "<br>Team " + t2.getNumber() + " has a climbing score of <b>" + t2.getClimbingScore() + "</b> and a speed of <b>" + t2.getClimbingSpeed() + "</b>";
+        report += "<br>Team " + t2.getNumber() + " has a high goal score of <b>" + t2.getHighGoalScore() + "</b>";
+        report += "<br>";
+        report += "<br>Team " + t3.getNumber() + " <b>" + (t3.canLowGoal() ? "CAN" : "CANNOT") + "</b> complete a low goal.";
+        report += "<br>Team " + t3.getNumber() + " <b>" + (t3.canChallenge() ? "CAN" : "CANNOT") + "</b> challenge the tower.";
+        report += "<br>Team " + t3.getNumber() + " has a climbing score of <b>" + t3.getClimbingScore() + "</b> and a speed of <b>" + t3.getClimbingSpeed() + "</b>";
+        report += "<br>Team " + t3.getNumber() + " has a high goal score of <b>" + t3.getHighGoalScore() + "</b>";
+        report += "<br><br><u>Autonomous</u>:";
+        report += "<br>Team " + t1.getNumber() + " <b>" + (t1.canAutoReach() ? "CAN" : "CANNOT") + "</b> Reach a defense.";
+        report += "<br>Team " + t1.getNumber() + " <b>" + (t1.canAutoLowGoal() ? "CAN" : "CANNOT") + "</b> shoot a low goal in autonomous.";
+        report += "<br>Team " + t1.getNumber() + " <b>" + (t1.canAutoHighGoal() ? "CAN" : "CANNOT") + "</b> shoot a high goal in autonomous.";
+        report += "<br>";
+        report += "<br>Team " + t2.getNumber() + " <b>" + (t2.canAutoReach() ? "CAN" : "CANNOT") + "</b> Reach a defense.";
+        report += "<br>Team " + t2.getNumber() + " <b>" + (t2.canAutoLowGoal() ? "CAN" : "CANNOT") + "</b> shoot a low goal in autonomous.";
+        report += "<br>Team " + t2.getNumber() + " <b>" + (t2.canAutoHighGoal() ? "CAN" : "CANNOT") + "</b> shoot a high goal in autonomous.";
+        report += "<br>";
+        report += "<br>Team " + t3.getNumber() + " <b>" + (t3.canAutoReach() ? "CAN" : "CANNOT") + "</b> Reach a defense.";
+        report += "<br>Team " + t3.getNumber() + " <b>" + (t3.canAutoLowGoal() ? "CAN" : "CANNOT") + "</b> shoot a low goal in autonomous.";
+        report += "<br>Team " + t3.getNumber() + " <b>" + (t3.canAutoHighGoal() ? "CAN" : "CANNOT") + "</b> shoot a high goal in autonomous.";
+        report += "<br>";
+        report += "<br>Portcullis: <b>" + (t1.canAutoPortcullis() ? "yes" : "no")
+                + "</b>, <b>" + (t2.canAutoPortcullis() ? "yes" : "no") + "</b>, <b>"
+                + (t3.canAutoPortcullis() ? "yes" : "no") + "</b>";
+        report += "<br>Chival De Frise: <b>" + (t1.canAutoChivalDeFrise() ? "yes" : "no")
+                + "</b>, <b>" + (t2.canAutoChivalDeFrise() ? "yes" : "no") + "</b>, <b>"
+                + (t3.canAutoChivalDeFrise() ? "yes" : "no") + "</b>";
+        report += "<br>Moat: <b>" + (t1.canAutoMoat() ? "yes" : "no")
+                + "</b>, <b>" + (t2.canAutoMoat() ? "yes" : "no") + "</b>, <b>"
+                + (t3.canAutoMoat() ? "yes" : "no") + "</b>";
+        report += "<br>Ramparts: <b>" + (t1.canAutoRamparts() ? "yes" : "no")
+                + "</b>, <b>" + (t2.canAutoRamparts() ? "yes" : "no") + "</b>, <b>"
+                + (t3.canAutoRamparts() ? "yes" : "no") + "</b>";
+        report += "<br>Drawbridge: <b>" + (t1.canAutoDrawbridge() ? "yes" : "no")
+                + "</b>, <b>" + (t2.canAutoDrawbridge() ? "yes" : "no") + "</b>, <b>"
+                + (t3.canAutoDrawbridge() ? "yes" : "no") + "</b>";
+        report += "<br>Sally Port: <b>" + (t1.canAutoSallyPort() ? "yes" : "no")
+                + "</b>, <b>" + (t2.canAutoSallyPort() ? "yes" : "no") + "</b>, <b>"
+                + (t3.canAutoSallyPort() ? "yes" : "no") + "</b>";
+        report += "<br>Rock Wall: <b>" + (t1.canAutoRockWall() ? "yes" : "no")
+                + "</b>, <b>" + (t2.canAutoRockWall() ? "yes" : "no") + "</b>, <b>"
+                + (t3.canAutoRockWall() ? "yes" : "no") + "</b>";
+        report += "<br>Rough Terrain: <b>" + (t1.canAutoRoughTerrain() ? "yes" : "no")
+                + "</b>, <b>" + (t2.canAutoRoughTerrain() ? "yes" : "no") + "</b>, <b>"
+                + (t3.canAutoRoughTerrain() ? "yes" : "no") + "</b>";
+        report += "<br>Low Bar: <b>" + (t1.canAutoLowbar() ? "yes" : "no")
+                + "</b>, <b>" + (t2.canAutoLowbar() ? "yes" : "no") + "</b>, <b>"
+                + (t3.canAutoLowbar() ? "yes" : "no") + "</b>";
+        report += "<br><br><u>Additional notes for team " + t1.getNumber() + "</u>:";
+        report += "<br>" + ("".equals(t1.getNotes()) ? "<i>none</i>" : t1.getNotes());
+        report += "<br><br><u>Additional notes for team " + t2.getNumber() + "</u>:";
+        report += "<br>" + ("".equals(t2.getNotes()) ? "<i>none</i>" : t2.getNotes());
+        report += "<br><br><u>Additional notes for team " + t3.getNumber() + "</u>:";
+        report += "<br>" + ("".equals(t3.getNotes()) ? "<i>none</i>" : t3.getNotes());
+        report += "</html>";
+        return report;
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;

@@ -1,16 +1,18 @@
 package com.coderedrobotics.scouting;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 public class Competition implements Serializable {
 
-    private HashMap<Integer, Team> teams;
+    private TreeMap<Integer, Team> teams;
     private static Competition instance;
 
     //this is just to make a list of what teams exist
     private Competition() {
-        teams = new HashMap<>();
+        teams = new TreeMap<>();
     }
 
     public static Competition getInstance() {
@@ -33,5 +35,13 @@ public class Competition implements Serializable {
             teams.put(number, new Team(number));
         }
         return teams.get(number);
+    }
+    
+    public Team[] getTeams() {
+        return teams.values().toArray(new Team[]{});
+    }
+    
+    public TreeMap<Integer, Team> getTeamTreeMap() {
+        return teams;
     }
 }
