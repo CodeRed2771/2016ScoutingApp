@@ -52,6 +52,10 @@ public class GUI extends javax.swing.JFrame {
         climbing = new javax.swing.JSlider();
         climbSpeed = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
+        made = new javax.swing.JSpinner();
+        missed = new javax.swing.JSpinner();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
         scoringPanel = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
@@ -82,6 +86,7 @@ public class GUI extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         saveButton = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("2016 Scouting App");
@@ -184,6 +189,10 @@ public class GUI extends javax.swing.JFrame {
 
         jLabel3.setText("Climb Speed:");
 
+        jLabel4.setText("Made");
+
+        jLabel11.setText("Missed");
+
         javax.swing.GroupLayout towerPanelLayout = new javax.swing.GroupLayout(towerPanel);
         towerPanel.setLayout(towerPanelLayout);
         towerPanelLayout.setHorizontalGroup(
@@ -199,12 +208,22 @@ public class GUI extends javax.swing.JFrame {
                         .addComponent(climbSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(towerPanelLayout.createSequentialGroup()
                         .addGroup(towerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addComponent(challenge)
                             .addComponent(highGoal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel2)
                             .addComponent(climbing, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 49, Short.MAX_VALUE)))
+                        .addGap(0, 49, Short.MAX_VALUE))
+                    .addGroup(towerPanelLayout.createSequentialGroup()
+                        .addGroup(towerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addComponent(challenge))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(towerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(made, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel4))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(towerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(missed, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel11))))
                 .addContainerGap())
         );
         towerPanelLayout.setVerticalGroup(
@@ -217,16 +236,23 @@ public class GUI extends javax.swing.JFrame {
                         .addComponent(jLabel3))
                     .addComponent(lowGoal))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(challenge)
+                .addGroup(towerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(challenge)
+                    .addGroup(towerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel4)
+                        .addComponent(jLabel11)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel1)
+                .addGroup(towerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(made, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(missed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(highGoal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(climbing, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
 
         scoringPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Control"));
@@ -415,6 +441,13 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
+        jButton1.setText("Robot Image");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -440,6 +473,8 @@ public class GUI extends javax.swing.JFrame {
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lookupButton)
+                        .addGap(120, 120, 120)
+                        .addComponent(jButton1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel7)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -456,7 +491,8 @@ public class GUI extends javax.swing.JFrame {
                     .addComponent(lookupButton)
                     .addComponent(teamNumber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel7)
-                    .addComponent(saveButton))
+                    .addComponent(saveButton)
+                    .addComponent(jButton1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(scoringPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -513,6 +549,8 @@ public class GUI extends javax.swing.JFrame {
                 t.setDoesntFollowRules(doesntFollowRules.isSelected());
                 t.setRankingFudge(Integer.parseInt(fudge.getValue().toString()));
                 t.setManualRankOverride(Integer.parseInt(manualOverride.getValue().toString()));
+                t.setMade((int) made.getValue());
+                t.setMissed((int) missed.getValue());
             }
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Please enter an integer climb speed.", "Number Format Exception", JOptionPane.ERROR_MESSAGE);
@@ -591,6 +629,8 @@ public class GUI extends javax.swing.JFrame {
         fudge.setValue(t.getRankingFudge());
         manualOverride.setValue(t.getManualRankOverride());
         disposition.setValue(t.getDisposition());
+        made.setValue(t.getMade());
+        missed.setValue(t.getMissed());
     }//GEN-LAST:event_teamNumberActionPerformed
 
     private void lookupButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lookupButtonActionPerformed
@@ -599,11 +639,22 @@ public class GUI extends javax.swing.JFrame {
         });
     }//GEN-LAST:event_lookupButtonActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        int number;
+        try {
+            number = Integer.parseInt(teamNumber.getText());
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Please enter a valid team number", "Number Format Exception", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        new RobotImage(number).setVisible(true);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the System Default look and feel */  
+        /* Set the System Default look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
@@ -617,6 +668,7 @@ public class GUI extends javax.swing.JFrame {
 
         try {
             Competition.setInstance(Serialization.readMemoryIn());
+            Network net = new Network();
         } catch (IOException | ClassNotFoundException ex) {
             Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -652,10 +704,13 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JCheckBox drawbridge;
     private javax.swing.JSpinner fudge;
     private javax.swing.JSlider highGoal;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
@@ -667,7 +722,9 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JButton lookupButton;
     private javax.swing.JCheckBox lowBar;
     private javax.swing.JCheckBox lowGoal;
+    private javax.swing.JSpinner made;
     private javax.swing.JSpinner manualOverride;
+    private javax.swing.JSpinner missed;
     private javax.swing.JCheckBox moat;
     private javax.swing.JTextArea notes;
     private javax.swing.JCheckBox portcullis;

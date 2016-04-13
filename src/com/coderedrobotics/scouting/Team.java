@@ -45,7 +45,13 @@ public class Team implements Serializable {
     private boolean autoLowGoal;
     private boolean autoHighGoal;
 
-    private String notes;
+    private String notes = "";
+    
+    private int made;
+    private int missed;
+    private int attemptedScales;
+    private int successfulScales;
+    private int speedSampleSize;
 
     public Team(int number) {
         this.number = number;
@@ -318,6 +324,38 @@ public class Team implements Serializable {
         this.manualRankOverride = manualRankOverride;
     }
 
+    public int getMade() {
+        return made;
+    }
+
+    public void setMade(int made) {
+        this.made = made;
+    }
+
+    public int getMissed() {
+        return missed;
+    }
+
+    public void setMissed(int missed) {
+        this.missed = missed;
+    }
+    
+    public void recalculateHighGoal(int missed, int made) {
+        this.missed += missed;
+        this.made += made;
+    }
+    
+    public void recalculateScale(boolean attempted, boolean succeeded) {
+        this.attemptedScales += attempted ? 1 : 0;
+        this.successfulScales += succeeded ? 1 : 0;
+        climbingScore = (int) (10 * (double) successfulScales / attemptedScales);
+    }
+    
+    public void reaverageScaleSpeed(int speed) {
+        int oldTotal = climbingSpeed * (speed != 0 ? speed : 1);
+        speedSampleSize++;
+        climbingSpeed = (oldTotal + speed) / speedSampleSize;
+    }
     //autonomous should give only 3 different values
     //if it has reached a defense, value can -1
     //if it has breached a defenese, value can 1

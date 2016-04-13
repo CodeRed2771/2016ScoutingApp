@@ -205,6 +205,12 @@ public class LookupGUI extends javax.swing.JFrame {
             report = can.stream().map((team) -> "<br>" + team).reduce(report, String::concat);
             report += "<br><br><u>Does Follow Rules:</u>:";
             report = cannot.stream().map((team) -> "<br>" + team).reduce(report, String::concat);
+        } else if ("notes".equals(jTextField1.getText())) {
+            report = "<html><head><style>p {max-width: 100px;}</style></head><u>Notes</u><br><br>";
+            for (Team t : Competition.getInstance().getTeams()) {
+                report += "<b>" + t.getNumber() + "</b>";
+                report += "<br><p>" + (!"".equals(t.getNotes()) ? t.getNotes() : "<i>None</i>") + "</p><br><br>";
+            }
         } else if ("defenses".equals(jTextField1.getText())) {
             report = "<html><head><style>table { table-layout: fixed;}td{width: 40px;text-align:center;}</style></head>";
             report += "<u>Defenses</u>";
